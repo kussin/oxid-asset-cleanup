@@ -21,7 +21,7 @@ class ImageCacheCleanupService
     /**
      * @return array{deleted: int, failed: int, missing: int, empty: int, bytes: int, logFile: string}
      */
-    public function flushImageCache(bool $dryRun): array
+    public function flushImageCache(bool $dryRun, bool $deleteEmptyDirectories = false): array
     {
         $summary = [
             'deleted' => 0,
@@ -35,7 +35,7 @@ class ImageCacheCleanupService
         $this->writeLogHeader($summary['logFile']);
 
         foreach ($this->getTargetDirectories() as $targetDirectory) {
-            $this->processDirectory($targetDirectory, $dryRun, $summary);
+            $this->processDirectory($targetDirectory, $dryRun, $deleteEmptyDirectories, $summary);
         }
 
         $this->writeSummary($summary);
@@ -46,7 +46,7 @@ class ImageCacheCleanupService
     /**
      * @param array{deleted: int, failed: int, missing: int, empty: int, bytes: int, logFile: string} $summary
      */
-    private function processDirectory(string $targetDirectory, bool $dryRun, array &$summary): void
+    private function processDirectory(string $targetDirectory, bool $dryRun, bool $deleteEmptyDirectories, array &$summary): void
     {
         $resolvedTargetDirectory = realpath($targetDirectory);
 
@@ -102,9 +102,57 @@ class ImageCacheCleanupService
             $this->writeLogLine($summary['logFile'], 'failed', $fileSize, $creationTime, $filePath, false);
         }
 
+        if ($deleteEmptyDirectories) {
+            $this->processEmptyDirectories($resolvedTargetDirectory, $dryRun, $summary);
+            return;
+        }
+
         if (!$foundFile) {
             $summary['empty']++;
             $this->writeLogLine($summary['logFile'], 'empty_directory_remove_manually', null, null, $resolvedTargetDirectory, $dryRun);
+        }
+    }
+
+    /**
+     * @param array{deleted: int, failed: int, missing: int, empty: int, bytes: int, logFile: string} $summary
+     */
+    private function processEmptyDirectories(string $targetDirectory, bool $dryRun, array &$summary): void
+    {
+        $directories = [];
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($targetDirectory, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($iterator as $fileInfo) {
+            if ($fileInfo instanceof SplFileInfo && $fileInfo->isDir()) {
+                $directories[] = $fileInfo->getPathname();
+            }
+        }
+
+        foreach ($directories as $directory) {
+            if (!$this->isBelowDirectory($directory, $targetDirectory)) {
+                $summary['failed']++;
+                $this->writeLogLine($summary['logFile'], 'skipped_empty_directory_outside_target', null, null, $directory, $dryRun);
+                continue;
+            }
+
+            if ($dryRun) {
+                $summary['empty']++;
+                $this->writeLogLine($summary['logFile'], 'dry_run_remove_empty_directory', null, null, $directory, true);
+                continue;
+            }
+
+            if ($this->isDirectoryEmpty($directory) && @rmdir($directory)) {
+                $summary['empty']++;
+                $this->writeLogLine($summary['logFile'], 'removed_empty_directory', null, null, $directory, false);
+                continue;
+            }
+
+            if ($this->isDirectoryEmpty($directory)) {
+                $summary['failed']++;
+                $this->writeLogLine($summary['logFile'], 'failed_empty_directory_remove', null, null, $directory, false);
+            }
         }
     }
 
@@ -226,5 +274,12 @@ class ImageCacheCleanupService
         $resolvedBaseDirectory = rtrim($resolvedBaseDirectory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 
         return stripos($resolvedFilePath, $resolvedBaseDirectory) === 0;
+    }
+
+    private function isDirectoryEmpty(string $directory): bool
+    {
+        $iterator = new FilesystemIterator($directory, FilesystemIterator::SKIP_DOTS);
+
+        return !$iterator->valid();
     }
 }

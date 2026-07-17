@@ -19,6 +19,7 @@ This file is the long-term development memory for `kussin/oxid-asset-cleanup`.
 - FATCHIP WebP cleanup writes timestamped logs named `KUSSIN_FCWEBP_CLEAR_WEBP_<timestamp>.log`.
 - Image cache flush removes generated OXID image cache files below `source/out/pictures/generated/`.
 - OXID regenerates generated image cache files on demand through the standard `out/pictures/generated/...` rewrite to `getimg.php`.
+- Image cache flush keeps empty directories by default; `--delete-empty-directories` removes empty generated-cache subdirectories after file deletion.
 - Additional legacy master picture directories can be configured through `aKussinAssetCleanupAdditionalPictureCleanupDirectories`.
 - Additional configured directories are processed by `scan-master` and `delete-master`, not by `flush-image-cache`.
 - Additional configured directories are resolved below `source/out/pictures/`; paths outside the picture directory are rejected.
