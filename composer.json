@@ -1,0 +1,49 @@
+{
+  "name": "kussin/oxid-asset-cleanup",
+  "version": "0.1.0",
+  "description": "KUSSIN | Asset Cleanup for OXID eShop",
+  "type": "oxideshop-module",
+  "keywords": [
+    "kussin",
+    "oxid",
+    "module",
+    "assets",
+    "cleanup"
+  ],
+  "homepage": "https://www.kussin.de/",
+  "license": [
+    "EULA"
+  ],
+  "authors": [
+    {
+      "name": "Kussin | eCommerce und Online-Marketing GmbH",
+      "email": "info@kussin.de",
+      "homepage": "https://www.kussin.de/",
+      "role": "Project Owner"
+    }
+  ],
+  "support": {
+    "email": "info@kussin.de",
+    "issues": "https://support.kussin.de/"
+  },
+  "extra": {
+    "oxideshop": {
+      "target-directory": "kussin/oxid-asset-cleanup",
+      "source-directory": ".",
+      "blacklist-filter": [
+        "build/**/*.*",
+        "grunt/**/*.*",
+        "node_modules/**/*.*"
+      ]
+    }
+  },
+  "require": {
+    "php": "^8.2",
+    "oxid-esales/oxideshop-ce": "^7.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "Kussin\\OxidAssetCleanup\\": "src/"
+    }
+  }
+}
