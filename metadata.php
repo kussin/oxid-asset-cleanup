@@ -16,5 +16,12 @@ $aModule = [
     'events' => [],
     'templates' => [],
     'blocks' => [],
-    'settings' => [],
+    'settings' => [
+        [
+            'group' => 'kussin_asset_cleanup_image_cache',
+            'name' => 'aKussinAssetCleanupAdditionalPictureCleanupDirectories',
+            'type' => 'arr',
+            'value' => [],
+        ],
+    ],
 ];

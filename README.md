@@ -28,6 +28,8 @@ vendor/bin/oe-console kussin:asset-cleanup:delete-master --dry-run
 vendor/bin/oe-console kussin:asset-cleanup:delete-master --force
 vendor/bin/oe-console kussin:asset-cleanup:delete-fcwebp --dry-run
 vendor/bin/oe-console kussin:asset-cleanup:delete-fcwebp --force
+vendor/bin/oe-console kussin:asset-cleanup:flush-image-cache --dry-run
+vendor/bin/oe-console kussin:asset-cleanup:flush-image-cache --force
 ```
 
 `scan-master` lists orphaned article master image files without deleting anything.
@@ -43,6 +45,12 @@ vendor/bin/oe-console kussin:asset-cleanup:delete-fcwebp --force
 - `source/out/pictures`
 
 The command only deletes files with the `.webp` extension. It requires `--force`; use `--dry-run` to log the files that would be deleted.
+
+`flush-image-cache` deletes generated OXID image cache files below `source/out/pictures/generated/`. OXID regenerates these files on demand through the standard `out/pictures/generated/...` rewrite to `getimg.php`, as long as the corresponding master image still exists.
+
+The command can also process additional legacy picture cache directories configured in the module setting `aKussinAssetCleanupAdditionalPictureCleanupDirectories`. Values are interpreted as directories below `source/out/pictures/`, for example `0`, `1`, `z1`, `_generated`, or `__master`.
+
+Configured directories that are empty are not removed automatically. They are logged with `empty_directory_remove_manually` so they can be reviewed and deleted manually.
 
 ## Detection Rules
 
@@ -68,6 +76,12 @@ FATCHIP WebP cleanup runs write a separate timestamped log file:
 
 ```text
 source/log/KUSSIN_FCWEBP_CLEAR_WEBP_<timestamp>.log
+```
+
+Image cache flush runs write a separate timestamped log file:
+
+```text
+source/log/KUSSIN_IMAGE_CACHE_FLUSH_<timestamp>.log
 ```
 
 ## Installation

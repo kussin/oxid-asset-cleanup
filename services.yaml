@@ -18,3 +18,7 @@ services:
   Kussin\OxidAssetCleanup\Command\DeleteFatchipWebpCommand:
     tags:
       - { name: 'console.command', command: 'kussin:asset-cleanup:delete-fcwebp' }
+
+  Kussin\OxidAssetCleanup\Command\FlushImageCacheCommand:
+    tags:
+      - { name: 'console.command', command: 'kussin:asset-cleanup:flush-image-cache' }
