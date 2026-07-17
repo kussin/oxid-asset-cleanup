@@ -14,6 +14,12 @@ class MasterPictureCleanupService
 {
     private const MAX_ARTICLE_PICTURES = 12;
     private const DELETE_LOG_FILE = 'kussin_asset_cleanup_deleted_files.log';
+    private const IMAGE_EXTENSIONS = [
+        'gif' => true,
+        'jpeg' => true,
+        'jpg' => true,
+        'png' => true,
+    ];
 
     /**
      * @return array<int, array{path: string, relativePath: string, size: int}>
@@ -35,6 +41,10 @@ class MasterPictureCleanupService
 
         foreach ($iterator as $file) {
             if (!$file instanceof SplFileInfo || !$file->isFile()) {
+                continue;
+            }
+
+            if (!$this->isSupportedImageFile($file)) {
                 continue;
             }
 
@@ -112,7 +122,7 @@ class MasterPictureCleanupService
 
     private function getMasterPictureDirectory(): string
     {
-        return $this->getPictureDirectory() . DIRECTORY_SEPARATOR . 'master';
+        return $this->getPictureDirectory() . DIRECTORY_SEPARATOR . 'master' . DIRECTORY_SEPARATOR . 'product';
     }
 
     private function getPictureDirectory(): string
@@ -190,6 +200,11 @@ class MasterPictureCleanupService
     private function normalizePath(string $path): string
     {
         return str_replace('\\', '/', $path);
+    }
+
+    private function isSupportedImageFile(SplFileInfo $file): bool
+    {
+        return isset(self::IMAGE_EXTENSIONS[strtolower($file->getExtension())]);
     }
 
     private function isBelowPictureDirectory(string $path): bool

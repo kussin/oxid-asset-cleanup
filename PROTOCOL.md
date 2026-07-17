@@ -10,8 +10,11 @@ This file is the long-term development memory for `kussin/oxid-asset-cleanup`.
 - Active target platform: OXID eShop PE 6.5.5.
 - The module does not require `kussin/oxid-base` because the current OXID 6 project has no base module dependency.
 - The package provides OXID console commands for product image asset maintenance.
-- The first cleanup target is `source/out/pictures/master/`.
-- Detection compares files below the master picture directory with article image references from `oxarticles.OXTHUMB`, `oxarticles.OXICON`, and `oxarticles.OXPIC1` through `oxarticles.OXPIC12`.
+- The first cleanup target is article master images below `source/out/pictures/master/product/`.
+- Detection compares image files below the article master picture directory with article image references from `oxarticles.OXTHUMB`, `oxarticles.OXICON`, and `oxarticles.OXPIC1` through `oxarticles.OXPIC12`.
+- Article master cleanup includes `gif`, `jpeg`, `jpg`, and `png` files only.
+- Article master cleanup excludes `.webp` files so generated FATCHIP assets are handled by `kussin:asset-cleanup:delete-fcwebp`.
+- Non-article master areas such as `master/vendor`, `master/manufacturer`, and `master/wrapping` are excluded from article master cleanup.
 - FATCHIP WebP cleanup removes generated `.webp` files below `source/out/dixeno_handar`, `source/out/media`, and `source/out/pictures`.
 - FATCHIP WebP cleanup writes timestamped logs named `KUSSIN_FCWEBP_CLEAR_WEBP_<timestamp>.log`.
 - Deletion requires the explicit `--force` option.
@@ -24,7 +27,8 @@ This file is the long-term development memory for `kussin/oxid-asset-cleanup`.
 - Add cleanup commands for assets linked from `oxcontents` and Visual CMS content.
 - Add cleanup commands for images linked from `oxmanufacturers`.
 - Add cleanup commands for images linked from `oxvendor`.
-- Add cleanup commands for generated product picture caches below `source/out/pictures/generated/`.
+- Add cleanup commands for wrapping and gift-card images below `source/out/pictures/master/wrapping/`.
+- Add a "Flush Image Cache" command for generated product picture caches below `source/out/pictures/generated/`.
 - Add optional age thresholds to avoid touching very recent files.
 - Add batch limits for very large installations.
 - Add CSV or JSON report output for audit workflows.
