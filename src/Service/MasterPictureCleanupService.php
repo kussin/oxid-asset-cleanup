@@ -12,6 +12,7 @@ use SplFileInfo;
 
 class MasterPictureCleanupService
 {
+    private const ADDITIONAL_DIRECTORIES_SETTING = 'aKussinAssetCleanupAdditionalPictureCleanupDirectories';
     private const MAX_ARTICLE_PICTURES = 12;
     private const DELETE_LOG_FILE = 'kussin_asset_cleanup_deleted_files.log';
     private const IMAGE_EXTENSIONS = [
@@ -21,46 +22,64 @@ class MasterPictureCleanupService
         'png' => true,
     ];
 
+    /** @var array<int, string> */
+    private $emptyDirectories = [];
+
+    /** @var array<int, string> */
+    private $missingDirectories = [];
+
     /**
      * @return array<int, array{path: string, relativePath: string, size: int}>
      */
     public function findOrphanedMasterPictures(): array
     {
         $pictureDirectory = $this->getPictureDirectory();
-        $masterDirectory = $this->getMasterPictureDirectory();
         $referencedPictures = $this->getReferencedArticlePictures();
         $orphans = [];
 
-        if (!is_dir($masterDirectory)) {
-            return [];
-        }
+        $this->emptyDirectories = [];
+        $this->missingDirectories = [];
 
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($masterDirectory, RecursiveDirectoryIterator::SKIP_DOTS)
-        );
-
-        foreach ($iterator as $file) {
-            if (!$file instanceof SplFileInfo || !$file->isFile()) {
+        foreach ($this->getMasterPictureDirectories() as $masterDirectory) {
+            if (!is_dir($masterDirectory)) {
+                $this->missingDirectories[] = $masterDirectory;
                 continue;
             }
 
-            if (!$this->isSupportedImageFile($file)) {
-                continue;
+            $foundFile = false;
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($masterDirectory, RecursiveDirectoryIterator::SKIP_DOTS)
+            );
+
+            foreach ($iterator as $file) {
+                if (!$file instanceof SplFileInfo || !$file->isFile()) {
+                    continue;
+                }
+
+                $foundFile = true;
+
+                if (!$this->isSupportedImageFile($file)) {
+                    continue;
+                }
+
+                $path = $file->getPathname();
+                $relativePath = $this->normalizeRelativePath($path, $pictureDirectory);
+                $basename = $this->normalizePath($file->getBasename());
+
+                if (isset($referencedPictures[$relativePath]) || isset($referencedPictures[$basename])) {
+                    continue;
+                }
+
+                $orphans[] = [
+                    'path' => $path,
+                    'relativePath' => $relativePath,
+                    'size' => (int) $file->getSize(),
+                ];
             }
 
-            $path = $file->getPathname();
-            $relativePath = $this->normalizeRelativePath($path, $pictureDirectory);
-            $basename = $this->normalizePath($file->getBasename());
-
-            if (isset($referencedPictures[$relativePath]) || isset($referencedPictures[$basename])) {
-                continue;
+            if (!$foundFile) {
+                $this->emptyDirectories[] = $masterDirectory;
             }
-
-            $orphans[] = [
-                'path' => $path,
-                'relativePath' => $relativePath,
-                'size' => (int) $file->getSize(),
-            ];
         }
 
         usort(
@@ -72,17 +91,31 @@ class MasterPictureCleanupService
     }
 
     /**
-     * @return array{deleted: int, failed: int, bytes: int}
+     * @return array{deleted: int, failed: int, missing: int, empty: int, bytes: int}
      */
     public function deleteOrphanedMasterPictures(bool $dryRun): array
     {
         $summary = [
             'deleted' => 0,
             'failed' => 0,
+            'missing' => 0,
+            'empty' => 0,
             'bytes' => 0,
         ];
 
-        foreach ($this->findOrphanedMasterPictures() as $file) {
+        $files = $this->findOrphanedMasterPictures();
+
+        foreach ($this->missingDirectories as $directory) {
+            $summary['missing']++;
+            $this->writeDeletionLog('MISSING_DIRECTORY', $directory, 0, $dryRun);
+        }
+
+        foreach ($this->emptyDirectories as $directory) {
+            $summary['empty']++;
+            $this->writeDeletionLog('EMPTY_DIRECTORY_REMOVE_MANUALLY', $directory, 0, $dryRun);
+        }
+
+        foreach ($files as $file) {
             $path = $file['path'];
             $size = $file['size'];
 
@@ -120,9 +153,25 @@ class MasterPictureCleanupService
         return $logDirectory . DIRECTORY_SEPARATOR . self::DELETE_LOG_FILE;
     }
 
-    private function getMasterPictureDirectory(): string
+    /**
+     * @return array<int, string>
+     */
+    private function getMasterPictureDirectories(): array
     {
-        return $this->getPictureDirectory() . DIRECTORY_SEPARATOR . 'master' . DIRECTORY_SEPARATOR . 'product';
+        $pictureDirectory = $this->getPictureDirectory();
+        $directories = [
+            $pictureDirectory . DIRECTORY_SEPARATOR . 'master' . DIRECTORY_SEPARATOR . 'product',
+        ];
+
+        foreach ($this->getAdditionalPictureDirectories() as $directory) {
+            $targetDirectory = $this->resolvePictureDirectory($pictureDirectory, $directory);
+
+            if ($targetDirectory !== null && !in_array($targetDirectory, $directories, true)) {
+                $directories[] = $targetDirectory;
+            }
+        }
+
+        return $directories;
     }
 
     private function getPictureDirectory(): string
@@ -131,6 +180,36 @@ class MasterPictureCleanupService
         $pictureDirectory = (string) $config->getConfigParam('sShopDir') . DIRECTORY_SEPARATOR . 'out' . DIRECTORY_SEPARATOR . 'pictures';
 
         return $this->normalizeFilesystemPath($pictureDirectory);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getAdditionalPictureDirectories(): array
+    {
+        $value = Registry::getConfig()->getConfigParam(self::ADDITIONAL_DIRECTORIES_SETTING);
+
+        if (!is_array($value)) {
+            return [];
+        }
+
+        return array_values(array_filter(array_map('trim', $value), static function (string $directory): bool {
+            return $directory !== '';
+        }));
+    }
+
+    private function resolvePictureDirectory(string $pictureDirectory, string $directory): ?string
+    {
+        $directory = trim(str_replace('\\', '/', $directory));
+        $directory = preg_replace('#^source/out/pictures/#', '', $directory);
+        $directory = preg_replace('#^out/pictures/#', '', $directory);
+        $directory = trim((string) $directory, '/');
+
+        if ($directory === '' || strpos($directory, '..') !== false) {
+            return null;
+        }
+
+        return rtrim($pictureDirectory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $directory);
     }
 
     /**

@@ -48,7 +48,7 @@ The command only deletes files with the `.webp` extension. It requires `--force`
 
 `flush-image-cache` deletes generated OXID image cache files below `source/out/pictures/generated/`. OXID regenerates these files on demand through the standard `out/pictures/generated/...` rewrite to `getimg.php`, as long as the corresponding master image still exists.
 
-The command can also process additional legacy picture cache directories configured in the module setting `aKussinAssetCleanupAdditionalPictureCleanupDirectories`. Values are interpreted as directories below `source/out/pictures/`, for example `0`, `1`, `z1`, `_generated`, or `__master`.
+`scan-master` and `delete-master` can also process additional legacy master picture directories configured in the module setting `aKussinAssetCleanupAdditionalPictureCleanupDirectories`. Values are interpreted as directories below `source/out/pictures/`, for example `0`, `1`, `z1`, `_master`, or `__master`.
 
 Configured directories that are empty are not removed automatically. They are logged with `empty_directory_remove_manually` so they can be reviewed and deleted manually.
 
@@ -58,6 +58,7 @@ Configured directories that are empty are not removed automatically. They are lo
 - Empty values and `nopic.jpg` are ignored.
 - Matching is based on normalized relative paths below the OXID picture directory and the stored file basename.
 - Only regular `gif`, `jpeg`, `jpg`, and `png` image files below the resolved `master/product` picture directory are candidates.
+- Additional configured legacy master directories are processed by the same article-reference matching logic.
 - WebP files are intentionally excluded from article master cleanup and must be handled by the FATCHIP WebP cleanup command.
 - Non-article master areas such as `master/vendor`, `master/manufacturer`, and `master/wrapping` are intentionally excluded from the article master cleanup.
 - Files outside the resolved OXID picture directory are never deleted.

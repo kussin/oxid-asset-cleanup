@@ -8,7 +8,7 @@ This file tracks planned cleanup commands for `kussin/oxid-asset-cleanup`.
 - Add commands for images linked from `oxmanufacturers`.
 - Add commands for images linked from `oxvendor`.
 - Add commands for wrapping and gift-card images below `source/out/pictures/master/wrapping/`.
-- Audit legacy picture subdirectories such as `0`, `1`, `z1`, `__master`, `_master`, and `_generated` before adding them to the configurable image cache flush directories.
+- Audit legacy picture subdirectories such as `0`, `1`, `z1`, `__master`, `_master`, and `_generated` before adding them to the configurable master cleanup directories.
 - Add a large-file report command that lists files at or above a configurable size threshold. Default threshold: `2 MB`.
 
 ## Command Behavior
@@ -24,4 +24,4 @@ This file tracks planned cleanup commands for `kussin/oxid-asset-cleanup`.
 
 - Identify all Visual CMS asset storage fields and embedded markup patterns before implementing content cleanup.
 - Decide whether manufacturer and vendor cleanup should scan only standard OXID image fields or also rich text and module-owned extension fields.
-- Decide which legacy `source/out/pictures/` subdirectories are cache-only and safe to configure for `kussin:asset-cleanup:flush-image-cache`.
+- Decide which legacy `source/out/pictures/` subdirectories correspond to old master-picture structures and are safe to configure for `kussin:asset-cleanup:delete-master`.

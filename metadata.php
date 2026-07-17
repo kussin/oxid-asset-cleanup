@@ -18,7 +18,7 @@ $aModule = [
     'blocks' => [],
     'settings' => [
         [
-            'group' => 'kussin_asset_cleanup_image_cache',
+            'group' => 'kussin_asset_cleanup_master_cleanup',
             'name' => 'aKussinAssetCleanupAdditionalPictureCleanupDirectories',
             'type' => 'arr',
             'value' => [],

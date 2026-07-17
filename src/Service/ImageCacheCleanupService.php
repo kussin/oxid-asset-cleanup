@@ -13,8 +13,6 @@ use SplFileInfo;
 
 class ImageCacheCleanupService
 {
-    private const ADDITIONAL_DIRECTORIES_SETTING = 'aKussinAssetCleanupAdditionalPictureCleanupDirectories';
-
     /** @var array<int, string> */
     private $defaultPictureDirectories = [
         'generated',
@@ -118,7 +116,7 @@ class ImageCacheCleanupService
         $pictureDirectory = $this->getPictureDirectory();
         $directories = [];
 
-        foreach (array_merge($this->defaultPictureDirectories, $this->getAdditionalPictureDirectories()) as $directory) {
+        foreach ($this->defaultPictureDirectories as $directory) {
             $targetDirectory = $this->resolvePictureDirectory($pictureDirectory, $directory);
 
             if ($targetDirectory !== null && !in_array($targetDirectory, $directories, true)) {
@@ -127,22 +125,6 @@ class ImageCacheCleanupService
         }
 
         return $directories;
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function getAdditionalPictureDirectories(): array
-    {
-        $value = Registry::getConfig()->getConfigParam(self::ADDITIONAL_DIRECTORIES_SETTING);
-
-        if (!is_array($value)) {
-            return [];
-        }
-
-        return array_values(array_filter(array_map('trim', $value), static function (string $directory): bool {
-            return $directory !== '';
-        }));
     }
 
     private function resolvePictureDirectory(string $pictureDirectory, string $directory): ?string

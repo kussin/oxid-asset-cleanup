@@ -42,11 +42,13 @@ class DeleteMasterPicturesCommand extends Command
 
         $summary = $this->cleanupService->deleteOrphanedMasterPictures($dryRun);
         $output->writeln(sprintf(
-            '%s %d orphaned master picture file(s), %d bytes total, %d failure(s).',
+            '%s %d orphaned master picture file(s), %d bytes total, %d failure(s), %d missing directories, %d empty directories.',
             $dryRun ? 'Would delete' : 'Deleted',
             $summary['deleted'],
             $summary['bytes'],
-            $summary['failed']
+            $summary['failed'],
+            $summary['missing'],
+            $summary['empty']
         ));
         $output->writeln(sprintf('Log file: %s', $this->cleanupService->getDeleteLogPath()));
 
