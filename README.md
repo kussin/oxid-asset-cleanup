@@ -1,13 +1,14 @@
 # KUSSIN | Asset Cleanup for OXID eShop
 
-This OXID 7 module provides console commands for finding and deleting orphaned product image assets.
+This OXID 6 module provides console commands for finding and deleting orphaned product image assets.
 
 ## Scope
 
 - Composer package: `kussin/oxid-asset-cleanup`
 - OXID module ID: `kussin_asset_cleanup`
-- Runtime target: OXID eShop PE/CE 7.4+
-- Planned base integration: `kussin/oxid-base` should require this package in a future release.
+- Runtime target: OXID eShop PE 6.5.5
+- Current package version: `0.0.1`
+- Base module dependency: none. The current OXID 6 package must not require `kussin/oxid-base`.
 - Package source path: `html/source/packages/kussin/oxid-asset-cleanup/`
 - External repository path: `E:\GitHub\Kussin_OxidAssetCleanup`
 
@@ -57,9 +58,13 @@ The module is intended to be required from the OXID Composer project root:
 composer require kussin/oxid-asset-cleanup
 ```
 
-In this repository, the OXID Composer project root is `html/source/` and Kussin packages are registered through the local path repository `./packages/kussin/*`.
+In this repository, the OXID Composer project root is `html/source/`.
 
-This package intentionally does not require `kussin/oxid-base`, because the planned dependency direction is `kussin/oxid-base` requiring `kussin/oxid-asset-cleanup`.
+For the current OXID 6.5.5 project, this package is intentionally standalone and does not require `kussin/oxid-base`.
+
+## TODO
+
+See `TODO.md` for the maintained cleanup backlog.
 
 ## Development Notes
 

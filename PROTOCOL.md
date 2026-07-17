@@ -6,8 +6,9 @@ This file is the long-term development memory for `kussin/oxid-asset-cleanup`.
 
 - Composer package name: `kussin/oxid-asset-cleanup`.
 - OXID module ID: `kussin_asset_cleanup`.
-- The module does not require `kussin/oxid-base` to avoid a future Composer dependency cycle.
-- Planned dependency direction: `kussin/oxid-base` should require `kussin/oxid-asset-cleanup` after validation.
+- Current package version: `0.0.1`.
+- Active target platform: OXID eShop PE 6.5.5.
+- The module does not require `kussin/oxid-base` because the current OXID 6 project has no base module dependency.
 - The package provides OXID console commands for product image asset maintenance.
 - The first cleanup target is `source/out/pictures/master/`.
 - Detection compares files below the master picture directory with article image references from `oxarticles.OXTHUMB`, `oxarticles.OXICON`, and `oxarticles.OXPIC1` through `oxarticles.OXPIC12`.
@@ -18,6 +19,10 @@ This file is the long-term development memory for `kussin/oxid-asset-cleanup`.
 
 ## Future Work
 
+- Add cleanup commands for FATCHIP-generated WebP images.
+- Add cleanup commands for assets linked from `oxcontents` and Visual CMS content.
+- Add cleanup commands for images linked from `oxmanufacturers`.
+- Add cleanup commands for images linked from `oxvendor`.
 - Add cleanup commands for generated product picture caches below `source/out/pictures/generated/`.
 - Add optional age thresholds to avoid touching very recent files.
 - Add batch limits for very large installations.

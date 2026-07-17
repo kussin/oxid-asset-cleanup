@@ -9,7 +9,7 @@ This file defines module-specific instructions for AI/code agents working on `ku
 - Target OXID module ID: `kussin_asset_cleanup`
 - OXID Composer project root: `html/source/`
 - OXID shop root: `html/source/source/`
-- Active target platform: OXID eShop PE/CE 7.4+
+- Active target platform: OXID eShop PE 6.5.5
 
 ## Language Rules
 
@@ -19,7 +19,7 @@ This file defines module-specific instructions for AI/code agents working on `ku
 
 ## Design Intent
 
-This module provides safe command-line maintenance tools for product image assets below `source/out/pictures/`.
+This module provides safe command-line maintenance tools for product and content assets below `source/out/pictures/`.
 
 The first supported cleanup target is `source/out/pictures/master/`, where product master images can become orphaned after products are deleted or article image fields are replaced over multiple years of shop operation.
 
@@ -31,6 +31,7 @@ The first supported cleanup target is `source/out/pictures/master/`, where produ
 - Never delete files outside the resolved OXID picture directory.
 - Prefer targeted cleanup commands over broad filesystem deletion.
 - Keep this package compatible with the local path repository `./packages/kussin/*`.
+- Do not require `kussin/oxid-base` while this package targets the current OXID 6.5.5 project.
 
 ## Verification
 

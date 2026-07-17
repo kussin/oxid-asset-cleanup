@@ -1,8 +1,16 @@
 services:
   _defaults:
+    public: false
     autowire: true
     autoconfigure: true
-    public: false
 
   Kussin\OxidAssetCleanup\:
-    resource: 'src/'
+    resource: './src/Service/'
+
+  Kussin\OxidAssetCleanup\Command\ScanMasterPicturesCommand:
+    tags:
+      - { name: 'console.command', command: 'kussin:asset-cleanup:scan-master' }
+
+  Kussin\OxidAssetCleanup\Command\DeleteMasterPicturesCommand:
+    tags:
+      - { name: 'console.command', command: 'kussin:asset-cleanup:delete-master' }
