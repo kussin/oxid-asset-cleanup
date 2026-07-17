@@ -14,3 +14,7 @@ services:
   Kussin\OxidAssetCleanup\Command\DeleteMasterPicturesCommand:
     tags:
       - { name: 'console.command', command: 'kussin:asset-cleanup:delete-master' }
+
+  Kussin\OxidAssetCleanup\Command\DeleteFatchipWebpCommand:
+    tags:
+      - { name: 'console.command', command: 'kussin:asset-cleanup:delete-fcwebp' }

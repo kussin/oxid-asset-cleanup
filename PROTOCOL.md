@@ -12,14 +12,15 @@ This file is the long-term development memory for `kussin/oxid-asset-cleanup`.
 - The package provides OXID console commands for product image asset maintenance.
 - The first cleanup target is `source/out/pictures/master/`.
 - Detection compares files below the master picture directory with article image references from `oxarticles.OXTHUMB`, `oxarticles.OXICON`, and `oxarticles.OXPIC1` through `oxarticles.OXPIC12`.
+- FATCHIP WebP cleanup removes generated `.webp` files below `source/out/dixeno_handar`, `source/out/media`, and `source/out/pictures`.
+- FATCHIP WebP cleanup writes timestamped logs named `KUSSIN_FCWEBP_CLEAR_WEBP_<timestamp>.log`.
 - Deletion requires the explicit `--force` option.
 - Dry runs are supported through `--dry-run`.
 - Deleted files are documented in `source/log/kussin_asset_cleanup_deleted_files.log`.
-- Cleanup code must never delete files outside the resolved OXID picture directory.
+- Cleanup code must never delete files outside the resolved OXID picture directory or another explicitly whitelisted shop asset directory.
 
 ## Future Work
 
-- Add cleanup commands for FATCHIP-generated WebP images.
 - Add cleanup commands for assets linked from `oxcontents` and Visual CMS content.
 - Add cleanup commands for images linked from `oxmanufacturers`.
 - Add cleanup commands for images linked from `oxvendor`.

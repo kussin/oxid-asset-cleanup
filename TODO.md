@@ -4,7 +4,6 @@ This file tracks planned cleanup commands for `kussin/oxid-asset-cleanup`.
 
 ## Next Cleanup Targets
 
-- Add commands for FATCHIP-generated WebP images.
 - Add commands for assets linked from `oxcontents` and Visual CMS content.
 - Add commands for images linked from `oxmanufacturers`.
 - Add commands for images linked from `oxvendor`.
@@ -20,6 +19,5 @@ This file tracks planned cleanup commands for `kussin/oxid-asset-cleanup`.
 
 ## Open Questions
 
-- Identify the exact FATCHIP WebP output paths and naming conventions in this installation.
 - Identify all Visual CMS asset storage fields and embedded markup patterns before implementing content cleanup.
 - Decide whether manufacturer and vendor cleanup should scan only standard OXID image fields or also rich text and module-owned extension fields.

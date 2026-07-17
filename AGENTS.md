@@ -28,7 +28,7 @@ The first supported cleanup target is `source/out/pictures/master/`, where produ
 - Use the `kussin` vendor prefix for module IDs, namespaces, command names, log file names, settings, translation keys, and public identifiers.
 - Keep cleanup behavior conservative. Deleting files must require an explicit force option.
 - Keep deletion logs append-only and human-readable.
-- Never delete files outside the resolved OXID picture directory.
+- Never delete files outside the resolved OXID picture directory or another explicitly whitelisted shop asset directory.
 - Prefer targeted cleanup commands over broad filesystem deletion.
 - Keep this package compatible with the local path repository `./packages/kussin/*`.
 - Do not require `kussin/oxid-base` while this package targets the current OXID 6.5.5 project.
