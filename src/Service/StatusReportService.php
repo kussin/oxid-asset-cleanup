@@ -128,6 +128,9 @@ class StatusReportService
         $pictureDirectory = $this->getPictureDirectory();
         $directories = [
             'article master cleanup' => $pictureDirectory . DIRECTORY_SEPARATOR . 'master' . DIRECTORY_SEPARATOR . 'product',
+            'manufacturer picture cleanup' => $pictureDirectory . DIRECTORY_SEPARATOR . 'master' . DIRECTORY_SEPARATOR . 'manufacturer' . DIRECTORY_SEPARATOR . 'icon',
+            'vendor picture cleanup' => $pictureDirectory . DIRECTORY_SEPARATOR . 'master' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'icon',
+            'wrapping picture cleanup' => $pictureDirectory . DIRECTORY_SEPARATOR . 'master' . DIRECTORY_SEPARATOR . 'wrapping',
             'generated image cache' => $pictureDirectory . DIRECTORY_SEPARATOR . 'generated',
             'FATCHIP out/media WebP cleanup' => $shopDirectory . DIRECTORY_SEPARATOR . 'out' . DIRECTORY_SEPARATOR . 'media',
             'FATCHIP out/pictures WebP cleanup' => $pictureDirectory,

@@ -15,6 +15,10 @@ This file is the long-term development memory for `kussin/oxid-asset-cleanup`.
 - Article master cleanup includes `gif`, `jpeg`, `jpg`, and `png` files only.
 - Article master cleanup excludes `.webp` files so generated FATCHIP assets are handled by `kussin:asset-cleanup:delete-fcwebp`.
 - Non-article master areas such as `master/vendor`, `master/manufacturer`, and `master/wrapping` are excluded from article master cleanup.
+- Manufacturer cleanup compares files below `source/out/pictures/master/manufacturer/icon/` with `oxmanufacturers.OXICON`.
+- Vendor cleanup compares files below `source/out/pictures/master/vendor/icon/` with `oxvendor.OXICON`.
+- Wrapping cleanup compares files below `source/out/pictures/master/wrapping/` with `oxwrapping.OXPIC`.
+- Manufacturer, vendor, and wrapping cleanup use separate scan and delete commands.
 - FATCHIP WebP cleanup removes generated `.webp` files below `source/out/dixeno_handar`, `source/out/media`, and `source/out/pictures`.
 - FATCHIP WebP cleanup writes timestamped logs named `KUSSIN_FCWEBP_CLEAR_WEBP_<timestamp>.log`.
 - Image cache flush removes generated OXID image cache files below `source/out/pictures/generated/`.
@@ -44,9 +48,6 @@ This file is the long-term development memory for `kussin/oxid-asset-cleanup`.
 ## Future Work
 
 - Add cleanup commands for assets linked from `oxcontents` and Visual CMS content.
-- Add cleanup commands for images linked from `oxmanufacturers`.
-- Add cleanup commands for images linked from `oxvendor`.
-- Add cleanup commands for wrapping and gift-card images below `source/out/pictures/master/wrapping/`.
 - Audit legacy picture subdirectories such as `0`, `1`, `z1`, `__master`, `_master`, and `_generated` before adding them to the configurable master cleanup directories.
 - Add optional age thresholds to avoid touching very recent files.
 - Add batch limits for very large installations.

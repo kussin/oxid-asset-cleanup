@@ -29,6 +29,10 @@ services:
     arguments:
       - '@Kussin\OxidAssetCleanup\Service\AssetCleanupSettingsService'
 
+  Kussin\OxidAssetCleanup\Service\ReferencedPictureCleanupService:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\AssetCleanupSettingsService'
+
   Kussin\OxidAssetCleanup\Command\ScanMasterPicturesCommand:
     arguments:
       - '@Kussin\OxidAssetCleanup\Service\MasterPictureCleanupService'
@@ -76,3 +80,39 @@ services:
       - '@Kussin\OxidAssetCleanup\Service\AssetCleanupSettingsService'
     tags:
       - { name: 'console.command', command: 'kussin:asset-cleanup:add-protected-directory' }
+
+  Kussin\OxidAssetCleanup\Command\ScanManufacturerPicturesCommand:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\ReferencedPictureCleanupService'
+    tags:
+      - { name: 'console.command', command: 'kussin:asset-cleanup:scan-manufacturer' }
+
+  Kussin\OxidAssetCleanup\Command\DeleteManufacturerPicturesCommand:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\ReferencedPictureCleanupService'
+    tags:
+      - { name: 'console.command', command: 'kussin:asset-cleanup:delete-manufacturer' }
+
+  Kussin\OxidAssetCleanup\Command\ScanVendorPicturesCommand:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\ReferencedPictureCleanupService'
+    tags:
+      - { name: 'console.command', command: 'kussin:asset-cleanup:scan-vendor' }
+
+  Kussin\OxidAssetCleanup\Command\DeleteVendorPicturesCommand:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\ReferencedPictureCleanupService'
+    tags:
+      - { name: 'console.command', command: 'kussin:asset-cleanup:delete-vendor' }
+
+  Kussin\OxidAssetCleanup\Command\ScanWrappingPicturesCommand:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\ReferencedPictureCleanupService'
+    tags:
+      - { name: 'console.command', command: 'kussin:asset-cleanup:scan-wrapping' }
+
+  Kussin\OxidAssetCleanup\Command\DeleteWrappingPicturesCommand:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\ReferencedPictureCleanupService'
+    tags:
+      - { name: 'console.command', command: 'kussin:asset-cleanup:delete-wrapping' }

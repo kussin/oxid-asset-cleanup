@@ -37,6 +37,12 @@ vendor/bin/oe-console kussin:asset-cleanup:delete-duplicate-directory-files sour
 vendor/bin/oe-console kussin:asset-cleanup:delete-duplicate-directory-files source/out/pictures/_master --force
 vendor/bin/oe-console kussin:asset-cleanup:add-picture-cleanup-directory _master
 vendor/bin/oe-console kussin:asset-cleanup:add-protected-directory source/out/wh1-2023
+vendor/bin/oe-console kussin:asset-cleanup:scan-manufacturer
+vendor/bin/oe-console kussin:asset-cleanup:delete-manufacturer --dry-run
+vendor/bin/oe-console kussin:asset-cleanup:scan-vendor
+vendor/bin/oe-console kussin:asset-cleanup:delete-vendor --dry-run
+vendor/bin/oe-console kussin:asset-cleanup:scan-wrapping
+vendor/bin/oe-console kussin:asset-cleanup:delete-wrapping --dry-run
 ```
 
 `scan-master` lists orphaned article master image files without deleting anything.
@@ -89,9 +95,18 @@ Add `--verify-hash` when duplicate deletion should require equal SHA-256 hashes 
 
 `add-protected-directory` appends a shop directory to the module setting `aKussinAssetCleanupProtectedDirectories`. This does not make the directory cleanable; it only removes it from the unusual-directory warning list.
 
+`scan-manufacturer` and `delete-manufacturer` process orphaned manufacturer icon files below `source/out/pictures/master/manufacturer/icon/`. References are read from `oxmanufacturers.OXICON`.
+
+`scan-vendor` and `delete-vendor` process orphaned vendor icon files below `source/out/pictures/master/vendor/icon/`. References are read from `oxvendor.OXICON`.
+
+`scan-wrapping` and `delete-wrapping` process orphaned wrapping and gift-card picture files below `source/out/pictures/master/wrapping/`. References are read from `oxwrapping.OXPIC`.
+
 ## Detection Rules
 
 - Referenced article images are read from `oxarticles.OXTHUMB`, `oxarticles.OXICON`, and `oxarticles.OXPIC1` through `oxarticles.OXPIC12`.
+- Referenced manufacturer images are read from `oxmanufacturers.OXICON`.
+- Referenced vendor images are read from `oxvendor.OXICON`.
+- Referenced wrapping images are read from `oxwrapping.OXPIC`.
 - Empty values and `nopic.jpg` are ignored.
 - Matching is based on normalized relative paths below the OXID picture directory and the stored file basename.
 - Only regular `gif`, `jpeg`, `jpg`, and `png` image files below the resolved `master/product` picture directory are candidates.
