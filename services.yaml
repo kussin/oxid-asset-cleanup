@@ -22,3 +22,11 @@ services:
   Kussin\OxidAssetCleanup\Command\FlushImageCacheCommand:
     tags:
       - { name: 'console.command', command: 'kussin:asset-cleanup:flush-image-cache' }
+
+  Kussin\OxidAssetCleanup\Command\StatusCommand:
+    tags:
+      - { name: 'console.command', command: 'kussin:asset-cleanup:status' }
+
+  Kussin\OxidAssetCleanup\Command\DeleteDuplicateDirectoryFilesCommand:
+    tags:
+      - { name: 'console.command', command: 'kussin:asset-cleanup:delete-duplicate-directory-files' }

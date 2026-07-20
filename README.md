@@ -31,6 +31,10 @@ vendor/bin/oe-console kussin:asset-cleanup:delete-fcwebp --force
 vendor/bin/oe-console kussin:asset-cleanup:flush-image-cache --dry-run
 vendor/bin/oe-console kussin:asset-cleanup:flush-image-cache --force
 vendor/bin/oe-console kussin:asset-cleanup:flush-image-cache --force --delete-empty-directories
+vendor/bin/oe-console kussin:asset-cleanup:status
+vendor/bin/oe-console kussin:asset-cleanup:status --min-size=20MB --path=source/export
+vendor/bin/oe-console kussin:asset-cleanup:delete-duplicate-directory-files source/out/pictures/_master --dry-run
+vendor/bin/oe-console kussin:asset-cleanup:delete-duplicate-directory-files source/out/pictures/_master --force
 ```
 
 `scan-master` lists orphaned article master image files without deleting anything.
@@ -54,6 +58,26 @@ By default, empty directories remain in place. Add `--delete-empty-directories` 
 `scan-master` and `delete-master` can also process additional legacy master picture directories configured in the module setting `aKussinAssetCleanupAdditionalPictureCleanupDirectories`. Values are interpreted as directories below `source/out/pictures/`, for example `0`, `1`, `z1`, `_master`, or `__master`.
 
 Configured directories that are empty are not removed automatically. They are logged with `empty_directory_remove_manually` so they can be reviewed and deleted manually.
+
+`status` prints a shop maintenance overview:
+
+- Disk usage for the OXID shop filesystem.
+- Directory sizes for cleanup targets handled by this module.
+- Large files below configured scan paths. The default threshold is `5MB`; use `--min-size=20MB` or similar to change it.
+- Direct child directories below `source/out/` and `source/out/pictures/` that are not part of the expected OXID 6 standard structure, including legacy picture directories and theme-like directories.
+
+Without `--path`, large files are searched below `source/out/` and, when present, `source/export/`. Repeat `--path` to scan specific directories.
+
+`delete-duplicate-directory-files` compares a directory copy with an original directory and deletes files from the copy when the same relative path exists in the original with the same file size. The copy directory is required. The original directory defaults to `source/out/pictures/master/`.
+
+Use `--dry-run` first:
+
+```bash
+vendor/bin/oe-console kussin:asset-cleanup:delete-duplicate-directory-files source/out/pictures/_master --dry-run
+vendor/bin/oe-console kussin:asset-cleanup:delete-duplicate-directory-files source/out/pictures/_master --original-directory=source/out/pictures/master --force
+```
+
+Add `--verify-hash` when duplicate deletion should require equal SHA-256 hashes in addition to equal relative path and file size. Both compared directories must resolve below the OXID picture directory.
 
 ## Detection Rules
 
@@ -86,6 +110,12 @@ Image cache flush runs write a separate timestamped log file:
 
 ```text
 source/log/KUSSIN_IMAGE_CACHE_FLUSH_<timestamp>.log
+```
+
+Duplicate directory cleanup runs write a separate timestamped log file:
+
+```text
+source/log/KUSSIN_DUPLICATE_DIRECTORY_CLEANUP_<timestamp>.log
 ```
 
 ## Installation

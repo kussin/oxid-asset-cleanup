@@ -24,6 +24,13 @@ This file is the long-term development memory for `kussin/oxid-asset-cleanup`.
 - Additional configured directories are processed by `scan-master` and `delete-master`, not by `flush-image-cache`.
 - Additional configured directories are resolved below `source/out/pictures/`; paths outside the picture directory are rejected.
 - Empty configured directories are logged with `empty_directory_remove_manually` and are not removed automatically.
+- The status command reports disk usage, cleanable directory sizes, large files, and unusual direct child directories below `source/out/` and `source/out/pictures/`.
+- The status command uses a default large-file threshold of `5MB` and supports one or more explicit scan paths through `--path`.
+- Duplicate directory cleanup compares a required copy directory against an original directory that defaults to `source/out/pictures/master/`.
+- Duplicate directory cleanup deletes only files from the copy directory and only when the same relative file path exists in the original directory with the same file size.
+- Duplicate directory cleanup can additionally require equal SHA-256 hashes through `--verify-hash`.
+- Duplicate directory cleanup writes timestamped logs named `KUSSIN_DUPLICATE_DIRECTORY_CLEANUP_<timestamp>.log`.
+- Duplicate directory cleanup requires both compared directories to resolve below the OXID picture directory.
 - Deletion requires the explicit `--force` option.
 - Dry runs are supported through `--dry-run`.
 - Deleted files are documented in `source/log/kussin_asset_cleanup_deleted_files.log`.
@@ -36,7 +43,6 @@ This file is the long-term development memory for `kussin/oxid-asset-cleanup`.
 - Add cleanup commands for images linked from `oxvendor`.
 - Add cleanup commands for wrapping and gift-card images below `source/out/pictures/master/wrapping/`.
 - Audit legacy picture subdirectories such as `0`, `1`, `z1`, `__master`, `_master`, and `_generated` before adding them to the configurable master cleanup directories.
-- Add a large-file report command with a default threshold of `2 MB`, a configurable minimum-size parameter, and configurable target directories such as `source/export/`.
 - Add optional age thresholds to avoid touching very recent files.
 - Add batch limits for very large installations.
 - Add CSV or JSON report output for audit workflows.
