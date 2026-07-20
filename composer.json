@@ -1,6 +1,6 @@
 {
   "name": "kussin/oxid-asset-cleanup",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "KUSSIN | Asset Cleanup for OXID eShop",
   "type": "oxideshop-module",
   "keywords": [
@@ -29,6 +29,7 @@
   "extra": {
     "oxideshop": {
       "target-directory": "kussin/oxid-asset-cleanup",
+      "source-directory": ".",
       "blacklist-filter": [
         "build/**/*.*",
         "grunt/**/*.*",
@@ -37,8 +38,8 @@
     }
   },
   "require": {
-    "php": ">=7.4",
-    "oxid-esales/oxideshop-ce": "^6.5"
+    "php": "^8.2",
+    "oxid-esales/oxideshop-ce": "^7.5"
   },
   "autoload": {
     "psr-4": {

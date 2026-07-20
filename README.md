@@ -1,14 +1,14 @@
 # KUSSIN | Asset Cleanup for OXID eShop
 
-This OXID 6 module provides console commands for finding and deleting orphaned product image assets.
+This OXID 7 module provides console commands for finding and deleting orphaned product image assets.
 
 ## Scope
 
 - Composer package: `kussin/oxid-asset-cleanup`
 - OXID module ID: `kussin_asset_cleanup`
-- Runtime target: OXID eShop PE 6.5.5
-- Current package version: `0.0.1`
-- Base module dependency: none. The current OXID 6 package must not require `kussin/oxid-base`.
+- Runtime target: OXID eShop PE 7.5.0 with PHP 8.4
+- Current package version: `1.0.0`
+- Base module relationship: `kussin/oxid-base` requires this package. This package must not require `kussin/oxid-base`.
 - Package source path: `html/source/packages/kussin/oxid-asset-cleanup/`
 - External repository path: `E:\GitHub\Kussin_OxidAssetCleanup`
 
@@ -74,7 +74,7 @@ Configured directories that are empty are not removed automatically. They are lo
 - Disk usage for the OXID shop filesystem.
 - Directory sizes for cleanup targets handled by this module.
 - Large files below configured scan paths. The default threshold is `5MB`; use `--min-size=20MB` or similar to change it.
-- Direct child directories below `source/out/` and `source/out/pictures/` that are not part of the expected OXID 6 standard structure, including legacy picture directories and theme-like directories.
+- Direct child directories below `source/out/` and `source/out/pictures/` that are not part of the expected OXID 7 standard structure, including legacy picture directories and theme-like directories.
 
 Without `--path`, large files are searched below `source/out/` and, when present, `source/export/`. Repeat `--path` to scan specific directories.
 
@@ -103,7 +103,7 @@ Add `--verify-hash` when duplicate deletion should require equal SHA-256 hashes 
 - `source/out/pictures/master/category/icon/`
 - `source/out/pictures/master/category/promo_icon/`
 
-References are read from `oxcategories.OXTHUMB`, `oxcategories.OXICON`, and `oxcategories.OXPROMOICON`. Legacy category fields such as `OXPIC1` through `OXPIC12` are intentionally not processed by this command because the OXID 6 standard category upload/rendering logic does not use them as category picture targets.
+References are read from `oxcategories.OXTHUMB`, `oxcategories.OXICON`, and `oxcategories.OXPROMOICON`. Legacy category fields such as `OXPIC1` through `OXPIC12` are intentionally not processed by this command because the standard category upload/rendering logic does not use them as category picture targets.
 
 `scan-manufacturer` and `delete-manufacturer` process orphaned manufacturer icon files below `source/out/pictures/master/manufacturer/icon/`. References are read from `oxmanufacturers.OXICON`.
 
@@ -165,7 +165,7 @@ composer require kussin/oxid-asset-cleanup
 
 In this repository, the OXID Composer project root is `html/source/`.
 
-For the current OXID 6.5.5 project, this package is intentionally standalone and does not require `kussin/oxid-base`.
+For the current OXID 7.5 project, this package is installed through `kussin/oxid-base` and remains independent from it to avoid a Composer dependency cycle.
 
 ## TODO
 

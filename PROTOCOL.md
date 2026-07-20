@@ -6,9 +6,9 @@ This file is the long-term development memory for `kussin/oxid-asset-cleanup`.
 
 - Composer package name: `kussin/oxid-asset-cleanup`.
 - OXID module ID: `kussin_asset_cleanup`.
-- Current package version: `0.0.1`.
-- Active target platform: OXID eShop PE 6.5.5.
-- The module does not require `kussin/oxid-base` because the current OXID 6 project has no base module dependency.
+- Current package version: `1.0.0`.
+- Active target platform: OXID eShop PE 7.5.0 with PHP 8.4.
+- The module is required by `kussin/oxid-base`, but it must not require `kussin/oxid-base` to avoid a Composer dependency cycle.
 - The package provides OXID console commands for product image asset maintenance.
 - The first cleanup target is article master images below `source/out/pictures/master/product/`.
 - Detection compares image files below the article master picture directory with article image references from `oxarticles.OXTHUMB`, `oxarticles.OXICON`, and `oxarticles.OXPIC1` through `oxarticles.OXPIC12`.
@@ -16,7 +16,7 @@ This file is the long-term development memory for `kussin/oxid-asset-cleanup`.
 - Article master cleanup excludes `.webp` files so generated FATCHIP assets are handled by `kussin:asset-cleanup:delete-fcwebp`.
 - Non-article master areas such as `master/vendor`, `master/manufacturer`, and `master/wrapping` are excluded from article master cleanup.
 - Category cleanup compares files below `source/out/pictures/master/category/thumb/`, `source/out/pictures/master/category/icon/`, and `source/out/pictures/master/category/promo_icon/` with `oxcategories.OXTHUMB`, `oxcategories.OXICON`, and `oxcategories.OXPROMOICON`.
-- Category cleanup intentionally does not process legacy `oxcategories.OXPIC1` through `oxcategories.OXPIC12` because the OXID 6 standard category upload/rendering logic does not use them as category picture targets.
+- Category cleanup intentionally does not process legacy `oxcategories.OXPIC1` through `oxcategories.OXPIC12` because the standard category upload/rendering logic does not use them as category picture targets.
 - Manufacturer cleanup compares files below `source/out/pictures/master/manufacturer/icon/` with `oxmanufacturers.OXICON`.
 - Vendor cleanup compares files below `source/out/pictures/master/vendor/icon/` with `oxvendor.OXICON`.
 - Wrapping cleanup compares files below `source/out/pictures/master/wrapping/` with `oxwrapping.OXPIC`.
