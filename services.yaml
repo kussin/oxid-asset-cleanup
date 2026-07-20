@@ -30,3 +30,11 @@ services:
   Kussin\OxidAssetCleanup\Command\DeleteDuplicateDirectoryFilesCommand:
     tags:
       - { name: 'console.command', command: 'kussin:asset-cleanup:delete-duplicate-directory-files' }
+
+  Kussin\OxidAssetCleanup\Command\AddAdditionalPictureCleanupDirectoryCommand:
+    tags:
+      - { name: 'console.command', command: 'kussin:asset-cleanup:add-picture-cleanup-directory' }
+
+  Kussin\OxidAssetCleanup\Command\AddProtectedDirectoryCommand:
+    tags:
+      - { name: 'console.command', command: 'kussin:asset-cleanup:add-protected-directory' }

@@ -26,6 +26,11 @@ This file is the long-term development memory for `kussin/oxid-asset-cleanup`.
 - Empty configured directories are logged with `empty_directory_remove_manually` and are not removed automatically.
 - The status command reports disk usage, cleanable directory sizes, large files, and unusual direct child directories below `source/out/` and `source/out/pictures/`.
 - The status command uses a default large-file threshold of `5MB` and supports one or more explicit scan paths through `--path`.
+- Directories configured in `aKussinAssetCleanupAdditionalPictureCleanupDirectories` are known cleanup targets and are excluded from the status command's unusual-directory list.
+- Directories configured in `aKussinAssetCleanupProtectedDirectories` are intentionally kept shop directories and are excluded from the status command's cleanable-directory and unusual-directory lists.
+- Protected directories are skipped by destructive cleanup commands.
+- Additional picture cleanup directories can be appended from CLI with `kussin:asset-cleanup:add-picture-cleanup-directory`.
+- Protected directories can be appended from CLI with `kussin:asset-cleanup:add-protected-directory`.
 - Duplicate directory cleanup compares a required copy directory against an original directory that defaults to `source/out/pictures/master/`.
 - Duplicate directory cleanup deletes only files from the copy directory and only when the same relative file path exists in the original directory with the same file size.
 - Duplicate directory cleanup can additionally require equal SHA-256 hashes through `--verify-hash`.

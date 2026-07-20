@@ -13,10 +13,18 @@ use SplFileInfo;
 
 class ImageCacheCleanupService
 {
+    /** @var AssetCleanupSettingsService */
+    private $settingsService;
+
     /** @var array<int, string> */
     private $defaultPictureDirectories = [
         'generated',
     ];
+
+    public function __construct(AssetCleanupSettingsService $settingsService)
+    {
+        $this->settingsService = $settingsService;
+    }
 
     /**
      * @return array{deleted: int, failed: int, missing: int, empty: int, bytes: int, logFile: string}
@@ -62,6 +70,12 @@ class ImageCacheCleanupService
             return;
         }
 
+        if ($this->settingsService->isProtectedPath($resolvedTargetDirectory)) {
+            $summary['failed']++;
+            $this->writeLogLine($summary['logFile'], 'skipped_protected_directory', null, null, $resolvedTargetDirectory, $dryRun);
+            return;
+        }
+
         $foundFile = false;
         $iterator = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($resolvedTargetDirectory, FilesystemIterator::SKIP_DOTS),
@@ -77,6 +91,11 @@ class ImageCacheCleanupService
             $filePath = $fileInfo->getPathname();
             $fileSize = (int) $fileInfo->getSize();
             $creationTime = date('Y-m-d H:i:s', $fileInfo->getCTime());
+
+            if ($this->settingsService->isProtectedPath($filePath)) {
+                $this->writeLogLine($summary['logFile'], 'skipped_protected_directory', $fileSize, $creationTime, $filePath, $dryRun);
+                continue;
+            }
 
             if (!$this->isBelowDirectory($filePath, $resolvedTargetDirectory)) {
                 $summary['failed']++;
@@ -131,6 +150,11 @@ class ImageCacheCleanupService
         }
 
         foreach ($directories as $directory) {
+            if ($this->settingsService->isProtectedPath($directory)) {
+                $this->writeLogLine($summary['logFile'], 'skipped_protected_directory', null, null, $directory, $dryRun);
+                continue;
+            }
+
             if (!$this->isBelowDirectory($directory, $targetDirectory)) {
                 $summary['failed']++;
                 $this->writeLogLine($summary['logFile'], 'skipped_empty_directory_outside_target', null, null, $directory, $dryRun);

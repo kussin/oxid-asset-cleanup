@@ -35,6 +35,8 @@ vendor/bin/oe-console kussin:asset-cleanup:status
 vendor/bin/oe-console kussin:asset-cleanup:status --min-size=20MB --path=source/export
 vendor/bin/oe-console kussin:asset-cleanup:delete-duplicate-directory-files source/out/pictures/_master --dry-run
 vendor/bin/oe-console kussin:asset-cleanup:delete-duplicate-directory-files source/out/pictures/_master --force
+vendor/bin/oe-console kussin:asset-cleanup:add-picture-cleanup-directory _master
+vendor/bin/oe-console kussin:asset-cleanup:add-protected-directory source/out/wh1-2023
 ```
 
 `scan-master` lists orphaned article master image files without deleting anything.
@@ -68,6 +70,10 @@ Configured directories that are empty are not removed automatically. They are lo
 
 Without `--path`, large files are searched below `source/out/` and, when present, `source/export/`. Repeat `--path` to scan specific directories.
 
+Directories configured in `aKussinAssetCleanupAdditionalPictureCleanupDirectories` are treated as known cleanup targets and are not listed again as unusual directories.
+
+Directories configured in `aKussinAssetCleanupProtectedDirectories` are treated as system-relevant or intentionally kept directories and are also excluded from the unusual-directory report. Values may be relative shop paths such as `source/out/wh1-2023` or absolute shop paths.
+
 `delete-duplicate-directory-files` compares a directory copy with an original directory and deletes files from the copy when the same relative path exists in the original with the same file size. The copy directory is required. The original directory defaults to `source/out/pictures/master/`.
 
 Use `--dry-run` first:
@@ -79,6 +85,10 @@ vendor/bin/oe-console kussin:asset-cleanup:delete-duplicate-directory-files sour
 
 Add `--verify-hash` when duplicate deletion should require equal SHA-256 hashes in addition to equal relative path and file size. Both compared directories must resolve below the OXID picture directory.
 
+`add-picture-cleanup-directory` appends a directory below `source/out/pictures/` to the module setting `aKussinAssetCleanupAdditionalPictureCleanupDirectories`. This makes the directory available to `scan-master`, `delete-master`, and the status report.
+
+`add-protected-directory` appends a shop directory to the module setting `aKussinAssetCleanupProtectedDirectories`. This does not make the directory cleanable; it only removes it from the unusual-directory warning list.
+
 ## Detection Rules
 
 - Referenced article images are read from `oxarticles.OXTHUMB`, `oxarticles.OXICON`, and `oxarticles.OXPIC1` through `oxarticles.OXPIC12`.
@@ -86,6 +96,7 @@ Add `--verify-hash` when duplicate deletion should require equal SHA-256 hashes 
 - Matching is based on normalized relative paths below the OXID picture directory and the stored file basename.
 - Only regular `gif`, `jpeg`, `jpg`, and `png` image files below the resolved `master/product` picture directory are candidates.
 - Additional configured legacy master directories are processed by the same article-reference matching logic.
+- Protected directories are reporting exclusions only. Cleanup commands must not delete them because they are protected.
 - WebP files are intentionally excluded from article master cleanup and must be handled by the FATCHIP WebP cleanup command.
 - Non-article master areas such as `master/vendor`, `master/manufacturer`, and `master/wrapping` are intentionally excluded from the article master cleanup.
 - Files outside the resolved OXID picture directory are never deleted.

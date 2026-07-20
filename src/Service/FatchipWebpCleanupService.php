@@ -13,12 +13,20 @@ use SplFileInfo;
 
 class FatchipWebpCleanupService
 {
+    /** @var AssetCleanupSettingsService */
+    private $settingsService;
+
     /** @var array<int, string> */
     private $relativeTargetDirectories = [
         'out/dixeno_handar',
         'out/media',
         'out/pictures',
     ];
+
+    public function __construct(AssetCleanupSettingsService $settingsService)
+    {
+        $this->settingsService = $settingsService;
+    }
 
     /**
      * @return array{deleted: int, failed: int, missing: int, bytes: int, logFile: string}
@@ -61,6 +69,11 @@ class FatchipWebpCleanupService
                 $filePath = $fileInfo->getPathname();
                 $fileSize = (int) $fileInfo->getSize();
                 $creationTime = date('Y-m-d H:i:s', $fileInfo->getCTime());
+
+                if ($this->settingsService->isProtectedPath($filePath)) {
+                    $this->writeLogLine($summary['logFile'], 'skipped_protected_directory', $fileSize, $creationTime, $filePath, $dryRun);
+                    continue;
+                }
 
                 if (!$this->isBelowDirectory($filePath, $resolvedTargetDirectory)) {
                     $summary['failed']++;

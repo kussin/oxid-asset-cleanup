@@ -28,6 +28,14 @@ class MasterPictureCleanupService
     /** @var array<int, string> */
     private $missingDirectories = [];
 
+    /** @var AssetCleanupSettingsService */
+    private $settingsService;
+
+    public function __construct(AssetCleanupSettingsService $settingsService)
+    {
+        $this->settingsService = $settingsService;
+    }
+
     /**
      * @return array<int, array{path: string, relativePath: string, size: int}>
      */
@@ -41,6 +49,10 @@ class MasterPictureCleanupService
         $this->missingDirectories = [];
 
         foreach ($this->getMasterPictureDirectories() as $masterDirectory) {
+            if ($this->settingsService->isProtectedPath($masterDirectory)) {
+                continue;
+            }
+
             if (!is_dir($masterDirectory)) {
                 $this->missingDirectories[] = $masterDirectory;
                 continue;
@@ -65,6 +77,10 @@ class MasterPictureCleanupService
                 $path = $file->getPathname();
                 $relativePath = $this->normalizeRelativePath($path, $pictureDirectory);
                 $basename = $this->normalizePath($file->getBasename());
+
+                if ($this->settingsService->isProtectedPath($path)) {
+                    continue;
+                }
 
                 if (isset($referencedPictures[$relativePath]) || isset($referencedPictures[$basename])) {
                     continue;

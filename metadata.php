@@ -23,5 +23,11 @@ $aModule = [
             'type' => 'arr',
             'value' => [],
         ],
+        [
+            'group' => 'kussin_asset_cleanup_status',
+            'name' => 'aKussinAssetCleanupProtectedDirectories',
+            'type' => 'arr',
+            'value' => [],
+        ],
     ],
 ];

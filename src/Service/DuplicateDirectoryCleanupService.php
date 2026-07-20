@@ -13,6 +13,14 @@ use SplFileInfo;
 
 class DuplicateDirectoryCleanupService
 {
+    /** @var AssetCleanupSettingsService */
+    private $settingsService;
+
+    public function __construct(AssetCleanupSettingsService $settingsService)
+    {
+        $this->settingsService = $settingsService;
+    }
+
     /**
      * @return array{deleted: int, skipped: int, failed: int, bytes: int, logFile: string}
      */
@@ -31,7 +39,7 @@ class DuplicateDirectoryCleanupService
         $copyDirectory = $this->resolveShopPath($copyDirectory);
         $originalDirectory = $this->resolveShopPath($originalDirectory);
 
-        if (!$this->isValidDirectoryPair($copyDirectory, $originalDirectory)) {
+        if (!$this->isValidDirectoryPair($copyDirectory, $originalDirectory) || $this->settingsService->isProtectedPath($copyDirectory)) {
             $summary['failed']++;
             $this->writeLogLine($summary['logFile'], 'invalid_directory_pair', null, '', $copyDirectory . ' => ' . $originalDirectory, $dryRun);
             $this->writeSummary($summary);
@@ -53,6 +61,12 @@ class DuplicateDirectoryCleanupService
 
             $copyPath = $fileInfo->getPathname();
             $relativePath = $this->normalizePath(substr($copyPath, strlen($copyDirectory) + 1));
+
+            if ($this->settingsService->isProtectedPath($copyPath)) {
+                $summary['skipped']++;
+                $this->writeLogLine($summary['logFile'], 'skipped_protected_directory', null, $relativePath, $copyPath, $dryRun);
+                continue;
+            }
 
             if (!isset($originalFiles[$relativePath])) {
                 $summary['skipped']++;

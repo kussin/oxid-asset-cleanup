@@ -13,6 +13,10 @@ use SplFileInfo;
 class StatusReportService
 {
     private const ADDITIONAL_DIRECTORIES_SETTING = 'aKussinAssetCleanupAdditionalPictureCleanupDirectories';
+    private const PROTECTED_DIRECTORIES_SETTING = 'aKussinAssetCleanupProtectedDirectories';
+
+    /** @var AssetCleanupSettingsService */
+    private $settingsService;
 
     /** @var array<int, string> */
     private $standardOutDirectories = [
@@ -32,6 +36,11 @@ class StatusReportService
         'generated',
         'master',
     ];
+
+    public function __construct(AssetCleanupSettingsService $settingsService)
+    {
+        $this->settingsService = $settingsService;
+    }
 
     /**
      * @param array<int, string> $largeFileDirectories
@@ -131,6 +140,10 @@ class StatusReportService
 
         $result = [];
         foreach ($directories as $label => $directory) {
+            if ($this->settingsService->isProtectedPath($directory)) {
+                continue;
+            }
+
             $size = $this->getDirectorySize($directory);
             $result[] = [
                 'label' => (string) $label,
@@ -236,12 +249,19 @@ class StatusReportService
         $result = [];
         $outDirectory = $this->getShopDirectory() . DIRECTORY_SEPARATOR . 'out';
         $pictureDirectory = $this->getPictureDirectory();
+        $protectedOutDirectories = $this->getProtectedChildDirectoryNames('out');
+        $protectedPictureDirectories = $this->getProtectedChildDirectoryNames('out/pictures');
+        $knownPictureDirectories = array_merge(
+            $this->standardPictureDirectories,
+            $this->getAdditionalPictureDirectoryNames(),
+            $protectedPictureDirectories
+        );
 
-        foreach ($this->findUnexpectedChildDirectories($outDirectory, $this->standardOutDirectories) as $directory) {
+        foreach ($this->findUnexpectedChildDirectories($outDirectory, array_merge($this->standardOutDirectories, $protectedOutDirectories)) as $directory) {
             $result[] = ['area' => 'source/out', 'path' => $directory];
         }
 
-        foreach ($this->findUnexpectedChildDirectories($pictureDirectory, $this->standardPictureDirectories) as $directory) {
+        foreach ($this->findUnexpectedChildDirectories($pictureDirectory, $knownPictureDirectories) as $directory) {
             $result[] = ['area' => 'source/out/pictures', 'path' => $directory];
         }
 
@@ -292,6 +312,83 @@ class StatusReportService
         return array_values(array_filter(array_map('trim', $value), static function (string $directory): bool {
             return $directory !== '';
         }));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getAdditionalPictureDirectoryNames(): array
+    {
+        $names = [];
+
+        foreach ($this->getAdditionalMasterDirectories() as $directory) {
+            $name = $this->getFirstPathSegment($directory);
+
+            if ($name !== '') {
+                $names[] = $name;
+            }
+        }
+
+        return array_values(array_unique($names));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getProtectedChildDirectoryNames(string $parentRelativePath): array
+    {
+        $value = Registry::getConfig()->getConfigParam(self::PROTECTED_DIRECTORIES_SETTING);
+
+        if (!is_array($value)) {
+            return [];
+        }
+
+        $names = [];
+        $parentRelativePath = trim(str_replace('\\', '/', $parentRelativePath), '/') . '/';
+
+        foreach ($value as $directory) {
+            $directory = $this->normalizeProtectedDirectory((string) $directory);
+
+            if (stripos($directory, $parentRelativePath) !== 0) {
+                continue;
+            }
+
+            $remainingPath = substr($directory, strlen($parentRelativePath));
+            $name = $this->getFirstPathSegment($remainingPath);
+
+            if ($name !== '') {
+                $names[] = $name;
+            }
+        }
+
+        return array_values(array_unique($names));
+    }
+
+    private function normalizeProtectedDirectory(string $directory): string
+    {
+        $directory = trim(str_replace('\\', '/', $directory));
+        $shopDirectory = str_replace('\\', '/', rtrim($this->getShopDirectory(), '/\\'));
+
+        if ($shopDirectory !== '' && stripos($directory, $shopDirectory . '/') === 0) {
+            $directory = substr($directory, strlen($shopDirectory) + 1);
+        }
+
+        $directory = preg_replace('#^source/#', '', $directory);
+
+        return trim((string) $directory, '/') . '/';
+    }
+
+    private function getFirstPathSegment(string $path): string
+    {
+        $path = trim(str_replace('\\', '/', $path), '/');
+
+        if ($path === '') {
+            return '';
+        }
+
+        $parts = explode('/', $path);
+
+        return (string) $parts[0];
     }
 
     private function resolvePictureDirectory(string $directory): string

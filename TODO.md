@@ -16,6 +16,7 @@ This file tracks planned cleanup commands for `kussin/oxid-asset-cleanup`.
 - Require `--force` for every destructive command.
 - Support `--dry-run` for every destructive command.
 - The status command must keep its configurable minimum size parameter and one or more configurable target directories, for example `source/export/`.
+- Directories configured in `aKussinAssetCleanupProtectedDirectories` must remain reporting exclusions and deletion guards, not cleanup targets.
 - Write deleted files to `source/log/kussin_asset_cleanup_deleted_files.log`.
 - Never delete files outside the resolved OXID picture directory or another explicitly whitelisted shop asset directory.
 
