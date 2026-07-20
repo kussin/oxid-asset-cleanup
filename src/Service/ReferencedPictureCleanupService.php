@@ -23,25 +23,35 @@ class ReferencedPictureCleanupService
     /** @var AssetCleanupSettingsService */
     private $settingsService;
 
-    /** @var array<string, array{label: string, table: string, fields: array<int, string>, directory: string}> */
+    /** @var array<string, array{label: string, table: string, fields: array<int, string>, directories: array<int, string>}> */
     private $targets = [
+        'category' => [
+            'label' => 'category picture',
+            'table' => 'oxcategories',
+            'fields' => ['OXTHUMB', 'OXICON', 'OXPROMOICON'],
+            'directories' => [
+                'master/category/thumb',
+                'master/category/icon',
+                'master/category/promo_icon',
+            ],
+        ],
         'manufacturer' => [
             'label' => 'manufacturer picture',
             'table' => 'oxmanufacturers',
             'fields' => ['OXICON'],
-            'directory' => 'master/manufacturer/icon',
+            'directories' => ['master/manufacturer/icon'],
         ],
         'vendor' => [
             'label' => 'vendor picture',
             'table' => 'oxvendor',
             'fields' => ['OXICON'],
-            'directory' => 'master/vendor/icon',
+            'directories' => ['master/vendor/icon'],
         ],
         'wrapping' => [
             'label' => 'wrapping picture',
             'table' => 'oxwrapping',
             'fields' => ['OXPIC'],
-            'directory' => 'master/wrapping',
+            'directories' => ['master/wrapping'],
         ],
     ];
 
@@ -57,40 +67,41 @@ class ReferencedPictureCleanupService
     {
         $definition = $this->getTargetDefinition($target);
         $pictureDirectory = $this->getPictureDirectory();
-        $targetDirectory = $this->getTargetDirectory($target);
-
-        if (!is_dir($targetDirectory) || $this->settingsService->isProtectedPath($targetDirectory)) {
-            return [];
-        }
-
         $references = $this->getReferences($definition['table'], $definition['fields']);
         $orphans = [];
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($targetDirectory, RecursiveDirectoryIterator::SKIP_DOTS)
-        );
 
-        foreach ($iterator as $file) {
-            if (!$file instanceof SplFileInfo || !$file->isFile() || !$this->isSupportedImageFile($file)) {
+        foreach ($this->getTargetDirectories($target) as $targetDirectory) {
+            if (!is_dir($targetDirectory) || $this->settingsService->isProtectedPath($targetDirectory)) {
                 continue;
             }
 
-            $path = $file->getPathname();
-            if ($this->settingsService->isProtectedPath($path)) {
-                continue;
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($targetDirectory, RecursiveDirectoryIterator::SKIP_DOTS)
+            );
+
+            foreach ($iterator as $file) {
+                if (!$file instanceof SplFileInfo || !$file->isFile() || !$this->isSupportedImageFile($file)) {
+                    continue;
+                }
+
+                $path = $file->getPathname();
+                if ($this->settingsService->isProtectedPath($path)) {
+                    continue;
+                }
+
+                $relativePath = $this->normalizeRelativePath($path, $pictureDirectory);
+                $basename = $this->normalizePath($file->getBasename());
+
+                if (isset($references[$relativePath]) || isset($references[$basename])) {
+                    continue;
+                }
+
+                $orphans[] = [
+                    'path' => $path,
+                    'relativePath' => $relativePath,
+                    'size' => (int) $file->getSize(),
+                ];
             }
-
-            $relativePath = $this->normalizeRelativePath($path, $pictureDirectory);
-            $basename = $this->normalizePath($file->getBasename());
-
-            if (isset($references[$relativePath]) || isset($references[$basename])) {
-                continue;
-            }
-
-            $orphans[] = [
-                'path' => $path,
-                'relativePath' => $relativePath,
-                'size' => (int) $file->getSize(),
-            ];
         }
 
         usort(
@@ -116,13 +127,13 @@ class ReferencedPictureCleanupService
         ];
 
         $this->writeLogHeader($summary['logFile']);
-        $targetDirectory = $this->getTargetDirectory($target);
+        $targetDirectories = $this->getTargetDirectories($target);
 
-        if (!is_dir($targetDirectory)) {
-            $summary['missing']++;
-            $this->writeLogLine($summary['logFile'], 'missing_directory', $dryRun, null, $targetDirectory);
-            $this->writeSummary($summary);
-            return $summary;
+        foreach ($targetDirectories as $targetDirectory) {
+            if (!is_dir($targetDirectory)) {
+                $summary['missing']++;
+                $this->writeLogLine($summary['logFile'], 'missing_directory', $dryRun, null, $targetDirectory);
+            }
         }
 
         $files = $this->findOrphanedPictures($target);
@@ -170,7 +181,7 @@ class ReferencedPictureCleanupService
     }
 
     /**
-     * @return array{label: string, table: string, fields: array<int, string>, directory: string}
+     * @return array{label: string, table: string, fields: array<int, string>, directories: array<int, string>}
      */
     private function getTargetDefinition(string $target): array
     {
@@ -218,9 +229,18 @@ class ReferencedPictureCleanupService
         return ltrim($value, '/');
     }
 
-    private function getTargetDirectory(string $target): string
+    /**
+     * @return array<int, string>
+     */
+    private function getTargetDirectories(string $target): array
     {
-        return $this->getPictureDirectory() . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $this->getTargetDefinition($target)['directory']);
+        $directories = [];
+
+        foreach ($this->getTargetDefinition($target)['directories'] as $directory) {
+            $directories[] = $this->getPictureDirectory() . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $directory);
+        }
+
+        return $directories;
     }
 
     private function getPictureDirectory(): string

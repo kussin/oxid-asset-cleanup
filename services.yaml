@@ -81,6 +81,18 @@ services:
     tags:
       - { name: 'console.command', command: 'kussin:asset-cleanup:add-protected-directory' }
 
+  Kussin\OxidAssetCleanup\Command\ScanCategoryPicturesCommand:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\ReferencedPictureCleanupService'
+    tags:
+      - { name: 'console.command', command: 'kussin:asset-cleanup:scan-category' }
+
+  Kussin\OxidAssetCleanup\Command\DeleteCategoryPicturesCommand:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\ReferencedPictureCleanupService'
+    tags:
+      - { name: 'console.command', command: 'kussin:asset-cleanup:delete-category' }
+
   Kussin\OxidAssetCleanup\Command\ScanManufacturerPicturesCommand:
     arguments:
       - '@Kussin\OxidAssetCleanup\Service\ReferencedPictureCleanupService'

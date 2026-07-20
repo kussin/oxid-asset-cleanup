@@ -128,6 +128,9 @@ class StatusReportService
         $pictureDirectory = $this->getPictureDirectory();
         $directories = [
             'article master cleanup' => $pictureDirectory . DIRECTORY_SEPARATOR . 'master' . DIRECTORY_SEPARATOR . 'product',
+            'category thumbnail cleanup' => $pictureDirectory . DIRECTORY_SEPARATOR . 'master' . DIRECTORY_SEPARATOR . 'category' . DIRECTORY_SEPARATOR . 'thumb',
+            'category icon cleanup' => $pictureDirectory . DIRECTORY_SEPARATOR . 'master' . DIRECTORY_SEPARATOR . 'category' . DIRECTORY_SEPARATOR . 'icon',
+            'category promo icon cleanup' => $pictureDirectory . DIRECTORY_SEPARATOR . 'master' . DIRECTORY_SEPARATOR . 'category' . DIRECTORY_SEPARATOR . 'promo_icon',
             'manufacturer picture cleanup' => $pictureDirectory . DIRECTORY_SEPARATOR . 'master' . DIRECTORY_SEPARATOR . 'manufacturer' . DIRECTORY_SEPARATOR . 'icon',
             'vendor picture cleanup' => $pictureDirectory . DIRECTORY_SEPARATOR . 'master' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'icon',
             'wrapping picture cleanup' => $pictureDirectory . DIRECTORY_SEPARATOR . 'master' . DIRECTORY_SEPARATOR . 'wrapping',

@@ -37,6 +37,8 @@ vendor/bin/oe-console kussin:asset-cleanup:delete-duplicate-directory-files sour
 vendor/bin/oe-console kussin:asset-cleanup:delete-duplicate-directory-files source/out/pictures/_master --force
 vendor/bin/oe-console kussin:asset-cleanup:add-picture-cleanup-directory _master
 vendor/bin/oe-console kussin:asset-cleanup:add-protected-directory source/out/wh1-2023
+vendor/bin/oe-console kussin:asset-cleanup:scan-category
+vendor/bin/oe-console kussin:asset-cleanup:delete-category --dry-run
 vendor/bin/oe-console kussin:asset-cleanup:scan-manufacturer
 vendor/bin/oe-console kussin:asset-cleanup:delete-manufacturer --dry-run
 vendor/bin/oe-console kussin:asset-cleanup:scan-vendor
@@ -95,6 +97,14 @@ Add `--verify-hash` when duplicate deletion should require equal SHA-256 hashes 
 
 `add-protected-directory` appends a shop directory to the module setting `aKussinAssetCleanupProtectedDirectories`. This does not make the directory cleanable; it only removes it from the unusual-directory warning list.
 
+`scan-category` and `delete-category` process orphaned category picture files below these OXID standard directories:
+
+- `source/out/pictures/master/category/thumb/`
+- `source/out/pictures/master/category/icon/`
+- `source/out/pictures/master/category/promo_icon/`
+
+References are read from `oxcategories.OXTHUMB`, `oxcategories.OXICON`, and `oxcategories.OXPROMOICON`. Legacy category fields such as `OXPIC1` through `OXPIC12` are intentionally not processed by this command because the OXID 6 standard category upload/rendering logic does not use them as category picture targets.
+
 `scan-manufacturer` and `delete-manufacturer` process orphaned manufacturer icon files below `source/out/pictures/master/manufacturer/icon/`. References are read from `oxmanufacturers.OXICON`.
 
 `scan-vendor` and `delete-vendor` process orphaned vendor icon files below `source/out/pictures/master/vendor/icon/`. References are read from `oxvendor.OXICON`.
@@ -104,6 +114,7 @@ Add `--verify-hash` when duplicate deletion should require equal SHA-256 hashes 
 ## Detection Rules
 
 - Referenced article images are read from `oxarticles.OXTHUMB`, `oxarticles.OXICON`, and `oxarticles.OXPIC1` through `oxarticles.OXPIC12`.
+- Referenced category images are read from `oxcategories.OXTHUMB`, `oxcategories.OXICON`, and `oxcategories.OXPROMOICON`.
 - Referenced manufacturer images are read from `oxmanufacturers.OXICON`.
 - Referenced vendor images are read from `oxvendor.OXICON`.
 - Referenced wrapping images are read from `oxwrapping.OXPIC`.
