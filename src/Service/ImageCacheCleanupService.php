@@ -21,9 +21,9 @@ class ImageCacheCleanupService
         'generated',
     ];
 
-    public function __construct(AssetCleanupSettingsService $settingsService)
+    public function __construct(?AssetCleanupSettingsService $settingsService = null)
     {
-        $this->settingsService = $settingsService;
+        $this->settingsService = $settingsService ?: new AssetCleanupSettingsService();
     }
 
     /**

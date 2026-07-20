@@ -7,34 +7,72 @@ services:
   Kussin\OxidAssetCleanup\Service\:
     resource: './src/Service/'
 
+  Kussin\OxidAssetCleanup\Service\AssetCleanupSettingsService: ~
+
+  Kussin\OxidAssetCleanup\Service\MasterPictureCleanupService:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\AssetCleanupSettingsService'
+
+  Kussin\OxidAssetCleanup\Service\FatchipWebpCleanupService:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\AssetCleanupSettingsService'
+
+  Kussin\OxidAssetCleanup\Service\ImageCacheCleanupService:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\AssetCleanupSettingsService'
+
+  Kussin\OxidAssetCleanup\Service\StatusReportService:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\AssetCleanupSettingsService'
+
+  Kussin\OxidAssetCleanup\Service\DuplicateDirectoryCleanupService:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\AssetCleanupSettingsService'
+
   Kussin\OxidAssetCleanup\Command\ScanMasterPicturesCommand:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\MasterPictureCleanupService'
     tags:
       - { name: 'console.command', command: 'kussin:asset-cleanup:scan-master' }
 
   Kussin\OxidAssetCleanup\Command\DeleteMasterPicturesCommand:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\MasterPictureCleanupService'
     tags:
       - { name: 'console.command', command: 'kussin:asset-cleanup:delete-master' }
 
   Kussin\OxidAssetCleanup\Command\DeleteFatchipWebpCommand:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\FatchipWebpCleanupService'
     tags:
       - { name: 'console.command', command: 'kussin:asset-cleanup:delete-fcwebp' }
 
   Kussin\OxidAssetCleanup\Command\FlushImageCacheCommand:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\ImageCacheCleanupService'
     tags:
       - { name: 'console.command', command: 'kussin:asset-cleanup:flush-image-cache' }
 
   Kussin\OxidAssetCleanup\Command\StatusCommand:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\StatusReportService'
     tags:
       - { name: 'console.command', command: 'kussin:asset-cleanup:status' }
 
   Kussin\OxidAssetCleanup\Command\DeleteDuplicateDirectoryFilesCommand:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\DuplicateDirectoryCleanupService'
     tags:
       - { name: 'console.command', command: 'kussin:asset-cleanup:delete-duplicate-directory-files' }
 
   Kussin\OxidAssetCleanup\Command\AddAdditionalPictureCleanupDirectoryCommand:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\AssetCleanupSettingsService'
     tags:
       - { name: 'console.command', command: 'kussin:asset-cleanup:add-picture-cleanup-directory' }
 
   Kussin\OxidAssetCleanup\Command\AddProtectedDirectoryCommand:
+    arguments:
+      - '@Kussin\OxidAssetCleanup\Service\AssetCleanupSettingsService'
     tags:
       - { name: 'console.command', command: 'kussin:asset-cleanup:add-protected-directory' }
